@@ -18,35 +18,55 @@ app.use(express.static("public"));
 db.connect();
 
 let list = [];
+let userID = 1;
 
-async function todolist() {
-    const data = await db.query("SELECT * FROM todolist");
+async function todolist(userID) {
+    const data = await db.query("SELECT a.id, a.task, a.member_id FROM todolist AS a JOIN family_members AS b ON a.member_id=b.id WHERE b.id = $1 ORDER BY a.id ASC", [userID]);
     list = data.rows;
+}
+async function family_member(){
+    const member = await db.query("SELECT * FROM family_members");
+    const memberList = member.rows;
+    return memberList;
 }
 
 app.get("/", async (req, res) => {
-    await todolist();
-    console.log(list);
-    res.render("index.ejs", { list });
+    await todolist(userID);
+    const member =await family_member();
+    res.render("index.ejs", { list, member});
+});
+
+app.post("/loadlist", async (req, res) => {
+    userID = req.body.memberId;
+    console.log(req.body.memberId);
+    res.redirect("/");
 });
 
 app.post("/edit/:id", async (req, res) => {
     const task = req.body.updatedtask;
     const id = req.params.id;
-    const data = await db.query('UPDATE todolist SET task = $1 WHERE id = $2 RETURNING *;', [task, id]);
+    console.log(task);
+    const data = await db.query('UPDATE todolist SET task = $1 WHERE member_id = $2 AND id = $3 RETURNING *;', [task, userID, id]);
     res.redirect("/");
 });
 
 app.post("/delete/:id", async (req, res) => {
     const id = req.params.id;
-    await db.query("DELETE FROM todolist WHERE id = $1", [id]);
+    const data = await db.query("DELETE FROM todolist WHERE id = $1 AND member_id = $2 RETURNING *", [id, userID]);
+    console.log(data);
     res.redirect("/");
 });
 
 app.post("/newitem", async (req, res) => {
     const updatetask = req.body.newtask;
     console.log(req.body);
-    await db.query("INSERT INTO todolist(task) VALUES($1) RETURNING *;", [updatetask]);
+    await db.query("INSERT INTO todolist(task, member_id) VALUES($1, $2) RETURNING *;", [updatetask, userID]);
+    res.redirect("/");
+})
+
+app.post("/addnew", async (req, res) => {
+    const name = req.body.membername;
+    const data = await db.query("INSERT INTO family_members(name) VALUES ($1) RETURNING *;", [name]);
     res.redirect("/");
 })
 

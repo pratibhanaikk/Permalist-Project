@@ -9,6 +9,26 @@
 </head>
 
 <body>
+    <div class="memberoffamily" style="display: flex; flex-direction: row;">
+        <% member.forEach((m)=> { %>
+            <form method="post" action="/loadlist">
+                <input type="hidden" name="memberId" value="<%= m.id %>">
+                <button type="submit" id="button-input">
+                    <%= m.name %>
+                </button>
+            </form>
+            <% }) %>
+
+             <button type="submit" id="add-button-input" onclick="addnewmember()">
+                    Add new Family member
+             </button>
+            <div id = "submit-button">
+            <form method="post" action="/addnew">
+                 <input id="addnewmember" type="text" hidden name="membername">
+                 <button id="addnewmembersubmit" type="submit" hidden>Submit</button>
+            </form>
+            </div>
+    </div>
     <h1 id="today">To-do List</h1>
     <div id="box">
         <% list.forEach(element=> { %>
@@ -23,8 +43,9 @@
                     </h3>
                     <form class="edit" method="post" action="/edit/<%=element.id%>">
                         <input type="hidden" id="taskupdate" name="updateid" value="<%= element.id %>">
-                        <input type="text" class="update-input" name="updatedtask" id="updatetask/<%= element.id %>" hidden>
-                        <button type="submit" class= "edit-button" id="submit-button/<%= element.id %>" hidden>
+                        <input type="text" class="update-input" name="updatedtask" id="updatetask/<%= element.id %>"
+                            hidden>
+                        <button type="submit" class="edit-button" id="submit-button/<%= element.id %>" hidden>
                             <img class="icon" src="/img/checked.png" alt="Save changes">
                         </button>
                     </form>
@@ -57,6 +78,11 @@
             } else {
                 checkbox.checked = false;
             }
+        }
+        function addnewmember(){
+            document.getElementById("add-button-input").setAttribute("hidden", true);
+            document.getElementById("addnewmember").removeAttribute("hidden");
+            document.getElementById("addnewmembersubmit").removeAttribute("hidden");
         }
     </script>
 </body>
