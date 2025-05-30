@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Permalist Project</title>
+    <link rel="stylesheet" href="/display.css">
+</head>
+
+<body>
+    <h1 id="today">To-do List</h1>
+    <div id="box">
+        <% list.forEach(element=> { %>
+            <div id="task-element">
+                <div id="per-task">
+                    <form method="post" action="/delete/<%= element.id %>" id="checkbox-dis">
+                        <input type="checkbox" onchange="confirmDelete(this)" name="deleteId" value="<%= element.id %>"
+                            aria-label="Delete task <%= element.task %>">
+                    </form>
+                    <h3 id="elementtask/<%= element.id %>" class="task-name">
+                        <%= element.task %>
+                    </h3>
+                    <form class="edit" method="post" action="/edit/<%=element.id%>">
+                        <input type="hidden" id="taskupdate" name="updateid" value="<%= element.id %>">
+                        <input type="text" class="update-input" name="updatedtask" id="updatetask/<%= element.id %>" hidden>
+                        <button type="submit" class= "edit-button" id="submit-button/<%= element.id %>" hidden>
+                            <img class="icon" src="/img/checked.png" alt="Save changes">
+                        </button>
+                    </form>
+                    <button type="submit" class="edit-button" id="editbutton/<%= element.id %>"
+                        onclick="editButtonUpdate(<%= element.id %>)">
+                        <img src="/img/pencil.png" class="icon" alt="Edit task">
+                    </button>
+                </div>
+            </div>
+            <% }); %>
+                <div class="added-newtask">
+                    <form method="post" action="/newitem" id="added-newtask">
+                        <input type="text" placeholder="New item" id="new-input" name="newtask"
+                            aria-label="Add new task" autocomplete="off" autofocus="true">
+                        <button type="submit" id="new-button">+</button>
+                    </form>
+                </div>
+    </div>
+    <script>
+        function editButtonUpdate(id) {
+            document.getElementById("elementtask/" + id).setAttribute("hidden", true);
+            document.getElementById("editbutton/" + id).setAttribute("hidden", true);
+            document.getElementById("updatetask/" + id).removeAttribute("hidden");
+            document.getElementById("submit-button/" + id).removeAttribute("hidden");
+        }
+
+        function confirmDelete(checkbox) {
+            if (confirm("Are you sure you want to delete this task?")) {
+                checkbox.form.submit();
+            } else {
+                checkbox.checked = false;
+            }
+        }
+    </script>
+</body>
+
+</html>
