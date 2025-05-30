@@ -29,11 +29,18 @@ async function family_member(){
     const memberList = member.rows;
     return memberList;
 }
+async function member_name(userID){
+    const member = await db.query("SELECT * FROM family_members");
+    const memberList = member.rows;
+    const name = memberList.find((m) => m.id == userID).name;
+    return name;
+}
 
 app.get("/", async (req, res) => {
     await todolist(userID);
     const member =await family_member();
-    res.render("index.ejs", { list, member});
+    const name =await member_name(userID);
+    res.render("index.ejs", { list, member, name});
 });
 
 app.post("/loadlist", async (req, res) => {
